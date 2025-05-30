@@ -1,11 +1,10 @@
-use actix_web::{web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{App, HttpResponse, HttpServer, Responder, web};
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
-use std::sync::Mutex;
 use std::collections::HashMap;
-use utoipa::{ToSchema, OpenApi};
+use std::sync::Mutex;
+use utoipa::{OpenApi, ToSchema};
 use utoipa_swagger_ui::SwaggerUi;
-
+use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, ToSchema, Clone)]
 
@@ -18,7 +17,7 @@ struct User {
 }
 
 type Db = Mutex<HashMap<Uuid, User>>;
-//macro is used to generate OpenAPI documentation 
+//macro is used to generate OpenAPI documentation
 #[utoipa::path(
     post, // HTTP method
     path = "/users", // URL path
@@ -60,10 +59,7 @@ async fn get_user_by_id(path: web::Path<Uuid>, db: web::Data<Db>) -> impl Respon
 }
 
 #[derive(OpenApi)]
-#[openapi(
-    paths(get_user_by_id, create_user),
-    components(schemas(User))
-)]
+#[openapi(paths(get_user_by_id, create_user), components(schemas(User)))]
 struct ApiDoc;
 
 #[actix_web::main]
