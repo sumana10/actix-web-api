@@ -6,7 +6,9 @@ use std::collections::HashMap;
 use utoipa::{ToSchema, OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
 
+
 #[derive(Serialize, Deserialize, ToSchema, Clone)]
+
 struct User {
     id: Uuid,
     name: String,
@@ -16,6 +18,25 @@ struct User {
 }
 
 type Db = Mutex<HashMap<Uuid, User>>;
+//macro is used to generate OpenAPI documentation 
+#[utoipa::path(
+    post, // HTTP method
+    path = "/users", // URL path
+    request_body = User, // The expected request body (a User struct)
+    responses(
+        (status = 201, description = "User created", body = User) // Expected response
+    )
+)]
+
+async fn create_user(user: web::Json<User>, db: web::Data<Db>) -> impl Responder {
+    let mut db = db.lock().unwrap();
+    let mut new_user = user.into_inner();
+    new_user.id = Uuid::new_v4();
+    new_user.created_at = chrono::Utc::now().timestamp() as u64;
+
+    db.insert(new_user.id, new_user.clone());
+    HttpResponse::Created().json(new_user)
+}
 
 #[utoipa::path(
     get,
@@ -26,6 +47,7 @@ type Db = Mutex<HashMap<Uuid, User>>;
         (status = 404, description = "User not found")
     )
 )]
+
 async fn get_user_by_id(path: web::Path<Uuid>, db: web::Data<Db>) -> impl Responder {
     let id = path.into_inner();
     let db = db.lock().unwrap();
@@ -37,24 +59,6 @@ async fn get_user_by_id(path: web::Path<Uuid>, db: web::Data<Db>) -> impl Respon
     }
 }
 
-#[utoipa::path(
-    post,
-    path = "/users",
-    request_body = User,
-    responses(
-        (status = 201, description = "User created", body = User)
-    )
-)]
-async fn create_user(user: web::Json<User>, db: web::Data<Db>) -> impl Responder {
-    let mut db = db.lock().unwrap();
-    let mut new_user = user.into_inner();
-    new_user.id = Uuid::new_v4();
-    new_user.created_at = chrono::Utc::now().timestamp() as u64;
-
-    db.insert(new_user.id, new_user.clone());
-    HttpResponse::Created().json(new_user)
-}
-
 #[derive(OpenApi)]
 #[openapi(
     paths(get_user_by_id, create_user),
@@ -63,6 +67,7 @@ async fn create_user(user: web::Json<User>, db: web::Data<Db>) -> impl Responder
 struct ApiDoc;
 
 #[actix_web::main]
+
 async fn main() -> std::io::Result<()> {
     println!("Server at http://localhost:8080");
 
