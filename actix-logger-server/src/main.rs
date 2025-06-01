@@ -1,6 +1,5 @@
 mod middleware;
 mod handlers;
-
 use actix_web::{web, App, HttpServer, middleware::Logger};
 use middleware::RequestLogger;
 

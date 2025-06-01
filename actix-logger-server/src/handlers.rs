@@ -9,6 +9,7 @@ pub struct User {
 }
 
 #[derive(Deserialize)]
+
 pub struct CreateUser {
     pub name: String,
     pub email: String,
@@ -41,43 +42,40 @@ pub async fn get_users() -> Result<HttpResponse> {
             email: "jane@example.com".to_string(),
         },
     ];
-    
     Ok(HttpResponse::Ok().json(users))
 }
 
 pub async fn get_user(path: web::Path<u32>) -> Result<HttpResponse> {
     let user_id = path.into_inner();
-    
     tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
-    
+
     let user = User {
         id: user_id,
         name: format!("User {}", user_id),
         email: format!("user{}@example.com", user_id),
     };
-    
     Ok(HttpResponse::Ok().json(user))
 }
 
 pub async fn create_user(user_data: web::Json<CreateUser>) -> Result<HttpResponse> {
     tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
-    
+
     let new_user = User {
-        id: 999, 
+        id: 999,
         name: user_data.name.clone(),
         email: user_data.email.clone(),
     };
-    
+
     Ok(HttpResponse::Created().json(new_user))
 }
 
 pub async fn delete_user(path: web::Path<u32>) -> Result<HttpResponse> {
     let user_id = path.into_inner();
-    
     tokio::time::sleep(tokio::time::Duration::from_millis(150)).await;
-    
+
     Ok(HttpResponse::Ok().json(serde_json::json!({
         "message": format!("User {} deleted successfully", user_id),
         "deleted_id": user_id
     })))
+
 }
