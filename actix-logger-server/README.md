@@ -40,3 +40,19 @@ cargo run
 ```
 Server runs on 127.0.0.1:8080.
 
+```
+App Startup:
+RequestLogger::new_transform(your_route_handler) 
+    ↓
+Creates: RequestLoggerMiddleware { service: your_route_handler }
+
+Runtime (each request):
+RequestLoggerMiddleware::call(request)
+    ↓
+1. Start timer
+2. Extract request info  
+3. Call wrapped service
+4. Wait for response
+5. Log timing
+6. Return response
+```

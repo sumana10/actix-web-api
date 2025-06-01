@@ -42,8 +42,10 @@ where
     S::Future: 'static,
     B: 'static,
 {
+  
     type Response = ServiceResponse<B>;
     type Error = Error;
+
     // Boxed future type to erase the concrete future type
     type Future = LocalBoxFuture<'static, Result<Self::Response, Self::Error>>;
 
@@ -65,9 +67,7 @@ where
         Box::pin(async move {
             let res = fut.await?;
             let duration = start_time.elapsed();
-            
             println!("{} {} - {}ms", method, path, duration.as_millis());
-            
             Ok(res)
         })
     }
