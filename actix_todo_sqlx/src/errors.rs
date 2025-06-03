@@ -3,6 +3,7 @@ use serde_json::json;
 use std::fmt;
 
 #[derive(Debug)]
+
 pub enum AppError {
     NotFound(String),
     InternalError(String),
@@ -24,7 +25,6 @@ impl ResponseError for AppError {
                 "error": "not_found",
                 "message": msg
             })),
-          
             AppError::InternalError(msg) => HttpResponse::InternalServerError().json(json!({
                 "error": "internal_error",
                 "message": msg
