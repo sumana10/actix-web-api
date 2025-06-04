@@ -11,8 +11,13 @@ pub async fn create_todo_handler(
     // // Convert Option<Priority> to &Priority with default
     let priority = todo.priority.as_ref().unwrap_or(&Priority::Medium);
 
-    let created_todo =
-        database::create_todo(&pool, &todo.title, todo.description.as_deref(), priority).await?;
+    let created_todo = database::create_todo(
+        pool.get_ref(),
+        &todo.title,
+        todo.description.as_deref(),
+        priority,
+    )
+    .await?;
 
     Ok(HttpResponse::Created().json(created_todo))
 }
@@ -22,14 +27,15 @@ pub async fn get_todo_handler(
     path: web::Path<i32>,
 ) -> Result<HttpResponse, AppError> {
     let id = path.into_inner();
-    match database::get_todo(&pool, id).await? {
+
+    match database::get_todo(pool.get_ref(), id).await? {
         Some(todo) => Ok(HttpResponse::Ok().json(todo)),
         None => Err(AppError::NotFound(format!("Todo with id {} not found", id))),
     }
 }
 
 pub async fn list_todos_handler(pool: web::Data<PgPool>) -> Result<HttpResponse, AppError> {
-    let todos = database::list_todos(&pool).await?;
+    let todos = database::list_todos(pool.get_ref()).await?;
     Ok(HttpResponse::Ok().json(todos))
 }
 
@@ -41,7 +47,7 @@ pub async fn update_todo_handler(
     let id = path.into_inner();
 
     match database::update_todo(
-        &pool,
+        pool.get_ref(),
         id,
         todo.title.as_deref(),
         todo.description.as_deref(),
@@ -61,12 +67,13 @@ pub async fn delete_todo_handler(
 ) -> Result<HttpResponse, AppError> {
     let id = path.into_inner();
 
-    if database::delete_todo(&pool, id).await? {
+    if database::delete_todo(pool.get_ref(), id).await? {
         Ok(HttpResponse::NoContent().finish())
     } else {
         Err(AppError::NotFound(format!("Todo with id {} not found", id)))
     }
 }
+
 pub async fn health_check() -> HttpResponse {
     HttpResponse::Ok().json(serde_json::json!({
         "status": "healthy",

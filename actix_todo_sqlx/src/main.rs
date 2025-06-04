@@ -1,5 +1,4 @@
 use actix_web::{App, HttpServer, middleware::Logger, web};
-
 mod database;
 mod errors;
 mod handlers;
@@ -18,7 +17,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(pool.clone())) //pool ownership move into the closure
+            .app_data(web::Data::new(pool.clone())) // //pool ownership move into the closure
             .wrap(Logger::default())
             .route("/health", web::get().to(health_check))
             .service(

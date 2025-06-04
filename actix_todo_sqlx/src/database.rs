@@ -23,10 +23,10 @@ async fn create_tables(pool: &PgPool) -> Result<(), sqlx::Error> {
         r#"
         CREATE TABLE IF NOT EXISTS todos (
             id SERIAL PRIMARY KEY,
-            title VARCHAR(255) NOT NULL,
+            title TEXT NOT NULL,
             description TEXT,
             completed BOOLEAN NOT NULL DEFAULT FALSE,
-            priority VARCHAR(50) NOT NULL DEFAULT 'medium',
+            priority TEXT NOT NULL DEFAULT 'medium',
             created_at TIMESTAMPTZ DEFAULT NOW(),
             updated_at TIMESTAMPTZ DEFAULT NOW()
         )
@@ -45,7 +45,7 @@ pub async fn create_todo(
     priority: &Priority,
 ) -> Result<Todo, AppError> {
     let now = Utc::now();
-
+    //    // Using sqlx::query_as with automatic
     let todo = sqlx::query_as::<_, Todo>(
         r#"
         INSERT INTO todos (title, description, completed, priority, created_at, updated_at)
@@ -69,7 +69,7 @@ pub async fn create_todo(
 pub async fn get_todo(pool: &PgPool, id: i32) -> Result<Option<Todo>, AppError> {
     let todo = sqlx::query_as::<_, Todo>("SELECT * FROM todos WHERE id =  $1")
         .bind(id)
-        .fetch_optional(pool) // Zero or One Row
+        .fetch_optional(pool) //Zero or one row
         .await
         .map_err(|e| AppError::InternalError(format!("Database error: {}", e)))?;
 
