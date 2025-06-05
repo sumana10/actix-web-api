@@ -66,6 +66,7 @@ pub async fn delete_todo_handler(
     path: web::Path<i32>,
 ) -> Result<HttpResponse, AppError> {
     let id = path.into_inner();
+//    // pool.get_ref() converts web::Data<PgPool> -> &PgPool
 
     if database::delete_todo(pool.get_ref(), id).await? {
         Ok(HttpResponse::NoContent().finish())
