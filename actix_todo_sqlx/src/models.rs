@@ -1,8 +1,9 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
+use utoipa::ToSchema;
 
-#[derive(Debug, Serialize, Deserialize, FromRow)] // FromRow enables query_as
+#[derive(Debug, Serialize, Deserialize, FromRow, ToSchema)] // FromRow enables query_as
 pub struct Todo {
     pub id: Option<i32>,
     pub title: String,
@@ -13,7 +14,7 @@ pub struct Todo {
     pub updated_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Type)]
+#[derive(Debug, Serialize, Deserialize, Clone, Type, ToSchema)]
 #[serde(rename_all = "lowercase")] // For JSON (HTTP requests/responses)
 #[sqlx(type_name = "text", rename_all = "lowercase")] // For database conversion
 
@@ -31,14 +32,14 @@ impl Default for Priority {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, ToSchema)]
 pub struct CreateTodo {
     pub title: String,
     pub description: Option<String>,
     pub priority: Option<Priority>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, ToSchema)]
 pub struct UpdateTodo {
     pub title: Option<String>,
     pub description: Option<String>,
@@ -46,7 +47,7 @@ pub struct UpdateTodo {
     pub priority: Option<Priority>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct TodoStats {
     pub total: i64,
     pub completed: i64,
@@ -54,7 +55,7 @@ pub struct TodoStats {
     pub by_priority: PriorityStats,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct PriorityStats {
     pub low: i64,
     pub medium: i64,

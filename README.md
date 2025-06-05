@@ -1,34 +1,41 @@
 # 🦀 Actix Web Demos
 
-A collection of minimal Actix-web projects showcasing various backend patterns in Rust.
+A collection of minimal Actix Web projects showcasing various backend patterns in **Rust**.
 
 ---
 
 ## 📦 Projects Overview
 
-### ✅ Basic REST API
-- Users and Posts CRUD
-- Route scoping: `/api/v1`, `/admin`
-- Query params, nested routes
+### ✅ [`actix_todo_sqlx`](https://github.com/sumana10/actix-web-api/tree/main/actix_todo_sqlx)
+- Basic TODO app with PostgreSQL and `sqlx`
+- RESTful routes for task management
 
-### 📘 Swagger API
+### 📘 [`actix_swagger_demo`](https://github.com/sumana10/actix-web-api/tree/main/actix_swagger_demo)
 - UUID-based user creation
 - Live Swagger documentation using `utoipa`
 
-### 🔒 Validation API
+### 🔒 [`actix_validate_api`](https://github.com/sumana10/actix-web-api/tree/main/actix_validate_api)
 - Accepts JSON and form inputs
-- Validations with `validator`
+- Input validation using `validator`
 - Custom error handling
 
-### 🧵 Multi-threading Demo
-- CPU-core-based threading
-- Prints thread ID per request
+### 🧵 [`actix_web_demo`](https://github.com/sumana10/actix-web-api/tree/main/actix_web_demo)
+- Multi-threading demo
+- Logs current thread ID on each request
 
-### 📝 Logging API
+### 📝 [`actix-logger-server`](https://github.com/sumana10/actix-web-api/tree/main/actix-logger-server)
 - Middleware-based request logging
-- Simple user CRUD
+- Basic CRUD functionality
 
-### 🔐 Shared State with Mutex
-- In-memory rate limiter per IP
-- Uses `Mutex<HashMap<IP, Count>>`
+### 🔐 [`rate_limiter_app`](https://github.com/sumana10/actix-web-api/tree/main/rate_limiter_app)
+- In-memory rate limiter using `Mutex<HashMap<IP, Count>>`
+- Shared state across threads
 
+### 🚀 [`my_actix_app`](https://github.com/sumana10/actix-web-api/tree/main/my_actix_app)
+- Sandbox for trying out new Actix features
+- Non-opinionated, exploratory setup
+
+### 📋 [`todo-actix`](https://github.com/sumana10/actix-web-api/tree/main/todo-actix)
+- TODO app using in-memory storage
+- Shared state handled with `Mutex<Vec<Todo>>`
+- No external database, ideal for quick testing and prototyping

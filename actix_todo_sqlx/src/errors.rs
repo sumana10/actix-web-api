@@ -1,9 +1,14 @@
 use actix_web::{HttpResponse, ResponseError};
-use serde_json::json;
+use serde::Serialize;
 use std::fmt;
+use utoipa::ToSchema;
 
+#[derive(Debug, Serialize, ToSchema)]
+pub struct ErrorResponse {
+    pub error: String,
+    pub message: String,
+}
 #[derive(Debug)]
-
 pub enum AppError {
     NotFound(String),
     InternalError(String),
@@ -21,14 +26,20 @@ impl fmt::Display for AppError {
 impl ResponseError for AppError {
     fn error_response(&self) -> HttpResponse {
         match self {
-            AppError::NotFound(msg) => HttpResponse::NotFound().json(json!({
-                "error": "not_found",
-                "message": msg
-            })),
-            AppError::InternalError(msg) => HttpResponse::InternalServerError().json(json!({
-                "error": "internal_error",
-                "message": msg
-            })),
+            AppError::NotFound(msg) => {
+                let response = ErrorResponse {
+                    error: "not_found".to_string(),
+                    message: msg.clone(),
+                };
+                HttpResponse::NotFound().json(response)
+            }
+            AppError::InternalError(msg) => {
+                let response = ErrorResponse {
+                    error: "internal_error".to_string(),
+                    message: msg.clone(),
+                };
+                HttpResponse::InternalServerError().json(response)
+            }
         }
     }
 }

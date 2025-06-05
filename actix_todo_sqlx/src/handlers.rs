@@ -4,6 +4,19 @@ use crate::models::{CreateTodo, Priority, UpdateTodo};
 use actix_web::{HttpResponse, Result, web};
 use sqlx::PgPool;
 
+#[utoipa::path(
+    post,
+    path = "/todos",
+    request_body = CreateTodo,
+    responses(
+        (status = 201, description = "Todo created successfully", body = Todo),
+        (status = 400, description = "Bad request", body = ErrorResponse),
+        (status = 404, description = "Todo not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse)
+    ),
+    tag = "todos"
+)]
+
 pub async fn create_todo_handler(
     pool: web::Data<PgPool>,
     todo: web::Json<CreateTodo>,
@@ -22,6 +35,19 @@ pub async fn create_todo_handler(
     Ok(HttpResponse::Created().json(created_todo))
 }
 
+#[utoipa::path(
+    get,
+    path = "/todos/{id}",
+    responses(
+        (status = 200, description = "Todo found successfully", body = Todo),
+        (status = 404, description = "Todo not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("id" = i32, Path, description = "Todo ID")
+    ),
+    tag = "todos"
+)]
 pub async fn get_todo_handler(
     pool: web::Data<PgPool>,
     path: web::Path<i32>,
@@ -34,11 +60,34 @@ pub async fn get_todo_handler(
     }
 }
 
+#[utoipa::path(
+    get,
+    path = "/todos",
+    responses(
+        (status = 200, description = "List of todos retrieved successfully", body = [Todo]),
+        (status = 500, description = "Internal server error", body = ErrorResponse)
+    ),
+    tag = "todos"
+)]
 pub async fn list_todos_handler(pool: web::Data<PgPool>) -> Result<HttpResponse, AppError> {
     let todos = database::list_todos(pool.get_ref()).await?;
     Ok(HttpResponse::Ok().json(todos))
 }
 
+#[utoipa::path(
+    put,
+    path = "/todos/{id}",
+    request_body = UpdateTodo,
+    responses(
+        (status = 200, description = "Todo updated successfully", body = Todo),
+        (status = 404, description = "Todo not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("id" = i32, Path, description = "Todo ID")
+    ),
+    tag = "todos"
+)]
 pub async fn update_todo_handler(
     pool: web::Data<PgPool>,
     path: web::Path<i32>,
@@ -61,12 +110,25 @@ pub async fn update_todo_handler(
     }
 }
 
+#[utoipa::path(
+    delete,
+    path = "/todos/{id}",
+    responses(
+        (status = 204, description = "Todo deleted successfully"),
+        (status = 404, description = "Todo not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse)
+    ),
+    params(
+        ("id" = i32, Path, description = "Todo ID")
+    ),
+    tag = "todos"
+)]
 pub async fn delete_todo_handler(
     pool: web::Data<PgPool>,
     path: web::Path<i32>,
 ) -> Result<HttpResponse, AppError> {
     let id = path.into_inner();
-//    // pool.get_ref() converts web::Data<PgPool> -> &PgPool
+    //    // pool.get_ref() converts web::Data<PgPool> -> &PgPool
 
     if database::delete_todo(pool.get_ref(), id).await? {
         Ok(HttpResponse::NoContent().finish())

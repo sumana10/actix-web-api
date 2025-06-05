@@ -4,22 +4,18 @@ A simple TODO API built with **Rust** (Actix Web) and **PostgreSQL**.
 
 ## Setup
 
-### 1. Start PostgreSQL with Docker
+### 1. Start the App
+
+Make sure Docker is installed. Then run:
 
 ```bash
-docker run --name postgres-todo \
-  -e POSTGRES_USER=todouser \
-  -e POSTGRES_PASSWORD=todopass \
-  -e POSTGRES_DB=todoapp \
-  -p 5433:5432 \
-  -d postgres:16
+docker-compose up -d && cargo run
 ```
-### 2. Run the App
+This will start PostgreSQL using Docker and run the Rust server.
 
-```
-cargo run
-```
-Server will run at: http://127.0.0.1:8080
+Server will be available at: http://127.0.0.1:8080
+
+API documentation: http://127.0.0.1:8080/swagger-ui/
 
 ## API Endpoints
 
