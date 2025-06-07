@@ -39,3 +39,11 @@ A collection of minimal Actix Web projects showcasing various backend patterns i
 - TODO app using in-memory storage
 - Shared state handled with `Mutex<Vec<Todo>>`
 - No external database, ideal for quick testing and prototyping
+
+
+### 🛡️ [`actix_jwt_api`](https://github.com/sumana10/actix-web-api/tree/main/actix_jwt_api)
+- Secure Notes API with JWT authentication
+- Built using Actix Web, PostgreSQL, and sqlx
+- Endpoints for user auth and CRUD operations on notes
+- Docker + cargo run based local setup
+- Includes a bash test script for API testing
