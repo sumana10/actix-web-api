@@ -25,7 +25,6 @@ pub struct AuthRequest {
     pub password: String,
 }
 
-
 #[derive(Deserialize)]
 pub struct NoteRequest {
     pub title: String,
@@ -33,8 +32,8 @@ pub struct NoteRequest {
 }
 
 // JWT Claims (required for JWT to work)
- #[derive(Serialize, Deserialize)]
- pub struct Claims {
+#[derive(Serialize, Deserialize)]
+pub struct Claims {
     pub user_id: String,
     pub exp: usize,
- }
+}

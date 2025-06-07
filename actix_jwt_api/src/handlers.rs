@@ -1,6 +1,6 @@
-use actix_web::{web, HttpRequest, HttpResponse, Result};
-use bcrypt::{hash, verify, DEFAULT_COST};
-use jsonwebtoken::{encode, decode, Header, Validation, EncodingKey, DecodingKey};
+use actix_web::{HttpRequest, HttpResponse, Result, web};
+use bcrypt::{DEFAULT_COST, hash, verify};
+use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, decode, encode};
 use serde::Serialize;
 use sqlx::PgPool;
 use std::env;
@@ -8,7 +8,7 @@ use uuid::Uuid;
 
 use crate::database::*;
 use crate::errors::AppError;
-use crate::models::{AuthRequest, NoteRequest, Claims};
+use crate::models::{AuthRequest, Claims, NoteRequest};
 
 #[derive(Serialize)]
 pub struct AuthResponse {
@@ -26,7 +26,6 @@ fn get_jwt_secret() -> String {
 }
 
 fn create_jwt_token(user_id: &Uuid) -> Result<String, AppError> {
-    
     let expiration = chrono::Utc::now()
         .checked_add_signed(chrono::Duration::hours(24))
         .expect("valid timestamp")
@@ -48,7 +47,6 @@ fn create_jwt_token(user_id: &Uuid) -> Result<String, AppError> {
 }
 
 fn extract_user_id_from_token(req: &HttpRequest) -> Result<Uuid, AppError> {
-   
     let auth_header = req
         .headers()
         .get("Authorization")
@@ -56,10 +54,9 @@ fn extract_user_id_from_token(req: &HttpRequest) -> Result<Uuid, AppError> {
         .to_str()
         .map_err(|_| AppError::Unauthorized("Invalid Authorization header".to_string()))?;
 
-
     let token = auth_header
         .strip_prefix("Bearer ")
-        .ok_or_else(|| AppError::Unauthorized("Invalid token format". to_string()))?;
+        .ok_or_else(|| AppError::Unauthorized("Invalid token format".to_string()))?;
 
     let token_data = decode::<Claims>(
         token,
@@ -109,7 +106,7 @@ pub async fn login(
         .map_err(|e| AppError::InternalError(format!("Password verification failed: {}", e)))?;
 
     if !is_valid {
-        return Err(AppError::Unauthorized("Invalid credentials".to_string()));
+        return Err(AppError::Unauthorized("Invalid credentilas".to_string()));
     }
 
     let token = create_jwt_token(&user.id)?;
@@ -121,7 +118,6 @@ pub async fn login(
 
     Ok(HttpResponse::Ok().json(response))
 }
-
 
 pub async fn create_note_handler(
     pool: web::Data<PgPool>,
@@ -149,11 +145,11 @@ pub async fn get_note_handler(
 ) -> Result<HttpResponse, AppError> {
     let note_id = path.into_inner();
     let user_id = extract_user_id_from_token(&http_req)?;
-    
+
     let note = get_note(&pool, note_id, user_id)
         .await?
         .ok_or_else(|| AppError::NotFound("Note not found".to_string()))?;
-    
+
     Ok(HttpResponse::Ok().json(note))
 }
 
@@ -165,11 +161,11 @@ pub async fn update_note_handler(
 ) -> Result<HttpResponse, AppError> {
     let note_id = path.into_inner();
     let user_id = extract_user_id_from_token(&http_req)?;
-    
+
     let note = update_note(&pool, note_id, user_id, &req)
         .await?
         .ok_or_else(|| AppError::NotFound("Note not found".to_string()))?;
-    
+
     Ok(HttpResponse::Ok().json(note))
 }
 
@@ -180,17 +176,16 @@ pub async fn delete_note_handler(
 ) -> Result<HttpResponse, AppError> {
     let note_id = path.into_inner();
     let user_id = extract_user_id_from_token(&http_req)?;
-    
     let deleted = delete_note(&pool, note_id, user_id).await?;
-    
+
     if !deleted {
         return Err(AppError::NotFound("Note not found".to_string()));
     }
-    
+
     let response = MessageResponse {
         message: "Note deleted successfully".to_string(),
     };
-    
+
     Ok(HttpResponse::Ok().json(response))
 }
 

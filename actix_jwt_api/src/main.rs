@@ -3,10 +3,8 @@ mod errors;
 mod handlers;
 mod models;
 
-use actix_web::{web, App, HttpServer, middleware::Logger};
+use actix_web::{App, HttpServer, middleware::Logger, web};
 use handlers::*;
-
-
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -18,7 +16,6 @@ async fn main() -> std::io::Result<()> {
 
     println!("Database connected successfully");
 
-    
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))
@@ -36,5 +33,3 @@ async fn main() -> std::io::Result<()> {
     .run()
     .await
 }
-
-
